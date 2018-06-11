@@ -33,7 +33,8 @@ var promotionSchema = new Schema({
         default: false
     },
 },
-   {
+   {   
+       usePushEach: true,
        timestamps: true
 });
 

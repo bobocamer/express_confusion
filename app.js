@@ -4,6 +4,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
+var passport = require('passport');
+var authenticate = require('./authenticate');
 
 var logger = require('morgan');
 
@@ -48,14 +50,16 @@ app.use(session({
   store: new FileStore()
 }));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 function auth(req, res, next) {
-  console.log(req.session);
+  console.log(req.user);
 
-  if (!req.session.user) {
-
+  if (!req.user) {
 
     var err = new Error('You are not authenticated!');
     res.setHeader('WWW-Authenticate', 'Basic');
@@ -65,16 +69,7 @@ function auth(req, res, next) {
   }
 
   else {
-    if (req.session.user === 'authenticated') {
-      next()
-    }
-    else {
-      var err = new Error('Your are not authenticated!');
-
-      err.status = 403;
-      return next(err);
-
-    }
+    next();
   }
 
 }
